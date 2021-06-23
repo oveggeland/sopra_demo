@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-import time
 
 
 def kmeans_cluster(img, k=10):
