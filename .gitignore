@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 # My stuff
-*.mp4
+data/
 .idea/
