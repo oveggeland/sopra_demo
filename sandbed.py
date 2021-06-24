@@ -45,6 +45,10 @@ def find_chickens(vid_num, img_num):
     centers = []
     #centers = kmeans_cluster(threshold_img, k=20)
     #centers = affinity_cluster(threshold_img)
-    centers = DBSCAN_cluster(threshold_img)
+    img, n_clusters = DBSCAN_cluster(threshold_img)
 
-    return centers
+    key = cv.waitKey()
+    if key & 0xFF == ord('q'):
+        exit()
+
+    return n_clusters

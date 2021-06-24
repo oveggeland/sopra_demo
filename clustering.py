@@ -4,6 +4,7 @@ from sklearn import cluster
 from visualizer import draw_circles, draw_db_clusters
 
 
+#TODO: Hierarical blablalba HDBSCAN implement!
 def DBSCAN_cluster(img):
     # Create clusters of an black/white image
     white_pixels = np.where(img)  # (x-coordinates, y-coordinates)
@@ -13,7 +14,7 @@ def DBSCAN_cluster(img):
     n_clusters = np.max(db.labels_)+1
     print(f"Number of clusters is {n_clusters}")
 
-    img = draw_db_clusters(img, coordinates, db)
+    #img = draw_db_clusters(img, coordinates, db)
 
     return img, n_clusters
 

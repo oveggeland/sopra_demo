@@ -7,48 +7,41 @@ from sandbed import find_chickens
 # Specify what image/frame to analyze
 VIDEO_NUM = 1
 IMG_NUM = 1
-N_IMAGES = 5
-
-# Defining bed corners
-OUTER_BED_CORNERS = np.array([
-        [930, 400],
-        [930, 910],
-        [1600, 900],
-        [1550, 400]
-    ], np.int32)
-
-INNER_BED_CORNERS = np.array([
-        [1010, 460],
-        [1010, 840],
-        [1530, 830],
-        [1500, 460]
-    ], np.int32)
-
+N_IMAGES = 100
+IMAGE_INTERVAL = 100
+FRAME_TIME = 1/19.72
 
 def main():
-    read_video()                            # Read video and save individual images
-    find_chickens(VIDEO_NUM, IMG_NUM)
+    #read_video()                            # Read video and save individual images
 
-    # Press any button to move on. Pressing 'q' exits the entire script
-    key = cv.waitKey()
-    if key & 0xFF == ord('q'):
-        exit()
+    chicken_counter = []
+    time = []
+    for i in range(N_IMAGES):
+        img_num = 1+IMAGE_INTERVAL*i
+        n_chickens = find_chickens(VIDEO_NUM, img_num)
+
+        chicken_counter.append(n_chickens)
+        time.append(img_num*FRAME_TIME)
+
+    plt.plot(time, chicken_counter)
+    plt.show()
 
 
-
-def read_video(filename=f"data/video{VIDEO_NUM}/video{VIDEO_NUM}.mp4"):
+def read_video():
+    filename = f"data/video{VIDEO_NUM}/video{VIDEO_NUM}.mp4"
     cap = cv.VideoCapture(filename)
     assert cap.isOpened(), "Error streaming video"
 
-    counter = 1
-    n_images = N_IMAGES
+    counter = 9900
     while cap.isOpened():
+        print(counter)
         retval, frame = cap.read()
         if retval:
             frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)  # Bruker 3 ganger mindre plass
-            cv.imwrite(f'data/video{VIDEO_NUM}/img{counter}.jpg', frame)
-            if counter >= n_images:
-                break
+            if counter % IMAGE_INTERVAL == 1:
+                cv.imwrite(f'data/video{VIDEO_NUM}/img{counter}.jpg', frame)
+        if counter == 1 + IMAGE_INTERVAL*(N_IMAGES-1):
+            break
         counter += 1
     cap.release()
 
