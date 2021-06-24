@@ -5,9 +5,9 @@ import torch
 from torchvision import transforms
 from torch.utils.data import Dataset
 
-class fishy_data(Dataset):
+class chicken_data(Dataset):
 
-    def __init__(self, img_dir = "images", annotations_dir = "annotations", transform = None):
+    def __init__(self, img_dir = "data/annotation/images", annotations_dir = "data/annotation/xml", transform = None):
         self.img_dir = img_dir
         self.annotations_dir = annotations_dir
         self.transform = transform
@@ -123,7 +123,7 @@ def show(batch, pred_bndbox = None):
     img.show()
 
 if __name__ == "__main__":
-    dataset = fishy_data(transform=transforms.ToTensor())
+    dataset = chicken_data(transform=transforms.ToTensor())
     print("len dataset: ", len(dataset))
 
     exs = dataset[0]
