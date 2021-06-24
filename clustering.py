@@ -18,8 +18,18 @@ def DBSCAN_cluster(img):
     return img, n_clusters
 
 
+def affinity_cluster(img):
+    white_pixels = np.where(img)  # (x-coordinates, y-coordinates)
+    coordinates = np.float32(np.column_stack((white_pixels[0], white_pixels[1])))
+
+    af = cluster.AffinityPropagation(damping=0.99, verbose=True)
+    print(1)
+    af.fit(coordinates[:, :])
+    print(2)
+    return img, af.cluster_centers_
+
+
 def kmeans_cluster(img, k=10):
-    # Create clusters of an black/white image
     white_pixels = np.where(img)    # (x-coordinates, y-coordinates)
     coordinates = np.float32(np.column_stack((white_pixels[0], white_pixels[1])))
 
