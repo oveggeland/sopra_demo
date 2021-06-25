@@ -11,17 +11,15 @@ def draw_circles(img, centers, radius=5, linesize=3):
     return img
 
 
-def draw_db_clusters(img, coordinates, db):
-    n_clusters = np.max(db.labels_)+1
-    for c in range(n_clusters):   # Iterate over each cluster
+def draw_db_clusters(img, coordinates, db, valid_clusters):
+    img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
+    for c in valid_clusters:   # Iterate over each cluster
+        color = (list(np.random.choice(range(256), size=3)))
         cluster_indices = np.where(db.labels_ == c)[0]
         cluster_coordinates = coordinates[cluster_indices].astype('int')
         for i in range(cluster_indices.size):
             y = int(cluster_coordinates[i, 0])
             x = int(cluster_coordinates[i, 1])
-            img[y, x] = 127
-        cv.imshow(f"num{c}", img)
-        key = cv.waitKey()
-        cv.destroyAllWindows()
-        if key & 0xFF == ord('q'):
-            exit()
+            img[y, x] = color
+
+    cv.imshow("Colored clusters", img)

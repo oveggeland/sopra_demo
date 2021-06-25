@@ -7,8 +7,8 @@ from sandbed import find_chickens
 # Specify what image/frame to analyze
 VIDEO_NUM = 1
 IMG_NUM = 1
-N_IMAGES = 100
-IMAGE_INTERVAL = 100
+N_IMAGES = 8
+IMAGE_INTERVAL = 1000
 FRAME_TIME = 1/19.72
 
 def main():

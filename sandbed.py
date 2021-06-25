@@ -2,8 +2,7 @@ import cv2 as cv
 import numpy as np
 
 from image_utils import mask_image, crop_image
-from clustering import kmeans_cluster, DBSCAN_cluster, affinity_cluster
-from visualizer import draw_circles
+from clustering import kmeans_cluster, DBSCAN_cluster
 
 # Defining bed corners
 OUTER_BED_CORNERS = np.array([
@@ -34,17 +33,14 @@ def find_chickens(vid_num, img_num):
     blurred_img = cv.bilateralFilter(masked_img, 20, 20, 20)
 
     # Apply white/black thresholding
-    threshold_img = cv.adaptiveThreshold(blurred_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 101, -5)
+    threshold_img = cv.adaptiveThreshold(blurred_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 101, -10)
 
     # Show different results
     #cv.imshow('Frame', img)
-    cv.imshow('Blurred', blurred_img)
-    cv.imshow('Threshold', threshold_img)
+    #cv.imshow('Blurred', blurred_img)
+    #cv.imshow('Threshold', threshold_img)
 
     # Cluster white areas to detect chickens
-    centers = []
-    #centers = kmeans_cluster(threshold_img, k=20)
-    #centers = affinity_cluster(threshold_img)
     img, n_clusters = DBSCAN_cluster(threshold_img)
 
     key = cv.waitKey()

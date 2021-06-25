@@ -4,30 +4,24 @@ from sklearn import cluster
 from visualizer import draw_circles, draw_db_clusters
 
 
-#TODO: Hierarical blablalba HDBSCAN implement!
 def DBSCAN_cluster(img):
     # Create clusters of an black/white image
     white_pixels = np.where(img)  # (x-coordinates, y-coordinates)
     coordinates = np.float32(np.column_stack((white_pixels[0], white_pixels[1])))
 
-    db = cluster.DBSCAN(eps=5, min_samples=50).fit(coordinates)
-    n_clusters = np.max(db.labels_)+1
-    print(f"Number of clusters is {n_clusters}")
+    db = cluster.DBSCAN(eps=3, min_samples=15).fit(coordinates)
+    unique, counts = np.unique(db.labels_, return_counts=True)
+    valid_clusters = np.where(counts[1:] > 500)[0]
+    n_chickens = valid_clusters.size
 
-    #img = draw_db_clusters(img, coordinates, db)
+    print(f"Number of clusters is {n_chickens}")
 
-    return img, n_clusters
+    img = draw_db_clusters(img, coordinates, db, valid_clusters)
+    key = cv.waitKey()
+    if key & 0xFF == ord('q'):
+        exit()
 
-
-def affinity_cluster(img):
-    white_pixels = np.where(img)  # (x-coordinates, y-coordinates)
-    coordinates = np.float32(np.column_stack((white_pixels[0], white_pixels[1])))
-
-    af = cluster.AffinityPropagation(damping=0.99, verbose=True)
-    print(1)
-    af.fit(coordinates[:, :])
-    print(2)
-    return img, af.cluster_centers_
+    return img, n_chickens
 
 
 def kmeans_cluster(img, k=10):
