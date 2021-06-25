@@ -5,35 +5,45 @@ from clustering import kmeans_cluster
 from visualizer import draw_circles
 
 # Specify what image/frame to analyze
-VIDEO_NUM = 1
+VIDEO_NUM = 2
 IMG_NUM = 1
-N_IMAGES = 5
+N_IMAGES = 10000
+IMAGE_INTERVAL = 20
 
+CORNERS = np.array([
+    [1000, 400],
+    [1600, 200],
+    [2100, 1540],
+    [300, 1540]
+])
 
 def main():
-    read_video()        # Read video and save individual images
-    analyze_image()     # Analyze image (default is specified by VIDEO_NUM and IMG_NUM)
+    #read_video()        # Read video and save individual images
+    find_empty_spaces()
 
 
-def analyze_image(dir=f'data/video{VIDEO_NUM}/img{IMG_NUM}.jpg'):
-    img = cv.imread(dir)
-    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    img = cv.resize(img, (1024, 720))  # TODO: Move this
+#TODO: Fjern forskjellen i lysstyrke
+def find_empty_spaces():
+    first_img = cv.imread(f"data/video{VIDEO_NUM}/img{IMG_NUM}.jpg", cv.IMREAD_GRAYSCALE).astype('float')
+    cum_array = first_img
+    for img_num in range(1+IMAGE_INTERVAL, N_IMAGES+1, IMAGE_INTERVAL):
+        print(f"Doing stuff with image {img_num}")
+        dir = f"data/video{VIDEO_NUM}/img{img_num}.jpg"
+        frame = cv.imread(dir, cv.IMREAD_GRAYSCALE).astype('float')
+        cum_array += frame
 
-    # Smooth images
-    blurred_img = cv.bilateralFilter(img, 20, 20, 10)
+    cum_array /= (N_IMAGES/IMAGE_INTERVAL)
+    cum_array = cum_array.astype(np.uint8)
 
-    # Apply white/black thresholding
-    threshold_img = cv.adaptiveThreshold(blurred_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 51, -10)
+    # Mask out area of interest defined by CORNERS
+    img_mask = np.zeros(cum_array.shape)
+    img_mask = cv.fillPoly(img_mask, [CORNERS], 1)
+    cum_array = np.where(img_mask == 1, cum_array, 255)
 
-    # Cluster white areas to detect hens
-    centers = kmeans_cluster(threshold_img, k=300)
 
-    # Show different results results
-    draw_circles(img, centers, radius=20)       # Detection visualizer
-    #cv.imshow('Frame', img)
-    #cv.imshow('Blurred', blurred_img)
-    #cv.imshow('Threshold', threshold_img)
+    #Reshape and show on screen!
+    cum_array = cv.resize(cum_array, [960, 540])
+    cv.imshow("Cumulative distribution over 100 frames", cum_array)
 
     # Press any button to move on. Pressing 'q' exits the entire script
     key = cv.waitKey()
@@ -48,6 +58,7 @@ def read_video(filename=f"data/video{VIDEO_NUM}/video{VIDEO_NUM}.mp4"):
     counter = 1
     n_images = N_IMAGES
     while cap.isOpened():
+        print(f"Reading image {counter}")
         retval, frame = cap.read()
         if retval:
             frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)  # Bruker 3 ganger mindre plass
