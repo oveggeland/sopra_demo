@@ -1,14 +1,13 @@
 import cv2 as cv
 import numpy as np
 
-from clustering import kmeans_cluster
-from visualizer import draw_circles
+from clustering import DBSCAN_cluster
 
 # Specify what image/frame to analyze
 VIDEO_NUM = 2
 IMG_NUM = 1
 N_IMAGES = 10000
-IMAGE_INTERVAL = 20
+IMAGE_INTERVAL = 10
 
 CORNERS = np.array([
     [1000, 400],
@@ -25,12 +24,13 @@ def main():
 #TODO: Fjern forskjellen i lysstyrke
 def find_empty_spaces():
     first_img = cv.imread(f"data/video{VIDEO_NUM}/img{IMG_NUM}.jpg", cv.IMREAD_GRAYSCALE).astype('float')
-    cum_array = first_img
-    for img_num in range(1+IMAGE_INTERVAL, N_IMAGES+1, IMAGE_INTERVAL):
+    cum_array = np.zeros(first_img.shape)
+    for img_num in range(1, N_IMAGES+1, IMAGE_INTERVAL):
         print(f"Doing stuff with image {img_num}")
         dir = f"data/video{VIDEO_NUM}/img{img_num}.jpg"
-        frame = cv.imread(dir, cv.IMREAD_GRAYSCALE).astype('float')
-        cum_array += frame
+        frame = cv.imread(dir, cv.IMREAD_GRAYSCALE)
+        frame = cv.adaptiveThreshold(frame, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 51, 0)
+        cum_array += frame.astype('float')
 
     cum_array /= (N_IMAGES/IMAGE_INTERVAL)
     cum_array = cum_array.astype(np.uint8)
@@ -43,7 +43,11 @@ def find_empty_spaces():
 
     #Reshape and show on screen!
     cum_array = cv.resize(cum_array, [960, 540])
-    cv.imshow("Cumulative distribution over 100 frames", cum_array)
+    cv.imshow(f"Cumulative distribution over {N_IMAGES} frames", cum_array)
+
+    # Try clustering black areas to see if any large regions are inhabitable
+    black_regions = np.where(cum_array < 40, 1, 0).astype(np.uint8)
+    n_regions = DBSCAN_cluster(black_regions)
 
     # Press any button to move on. Pressing 'q' exits the entire script
     key = cv.waitKey()
