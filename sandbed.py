@@ -1,8 +1,9 @@
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
 
 from image_utils import mask_image, crop_image
-from clustering import kmeans_cluster, DBSCAN_cluster
+from clustering import DBSCAN_cluster
 
 # Defining bed corners
 OUTER_BED_CORNERS = np.array([
@@ -18,6 +19,26 @@ INNER_BED_CORNERS = np.array([
         [1530, 830],
         [1500, 460]
     ], np.int32)
+
+VIDEO_NUM = 1
+IMG_NUM = 1
+N_IMAGES = 8
+IMAGE_INTERVAL = 1000
+FRAME_TIME = 1/19.72
+
+def chickens_over_time(video_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES,\
+                       image_interval=IMAGE_INTERVAL, frame_time=FRAME_TIME):
+    chicken_counter = []
+    time = []
+    for i in range(n_images):
+        img_num = img_num+image_interval*i
+        n_chickens = find_chickens(video_num, img_num)
+
+        chicken_counter.append(n_chickens)
+        time.append(img_num*frame_time)
+
+    plt.plot(time, chicken_counter)
+    plt.show()
 
 
 def find_chickens(vid_num, img_num):
