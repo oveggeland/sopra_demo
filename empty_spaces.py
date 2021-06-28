@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 
 from clustering import DBSCAN_cluster
+from visualizer import create_heat_map
 
 CORNERS = np.array([
     [1000, 400],
@@ -12,7 +13,7 @@ CORNERS = np.array([
 
 VIDEO_NUM = 2
 IMG_NUM = 1
-N_IMAGES = 10000
+N_IMAGES = 10
 IMAGE_INTERVAL = 10
 
 
@@ -36,6 +37,7 @@ def find_empty_spaces(vid_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES, ima
 
 
     #Reshape and show on screen!
+    create_heat_map(cum_array, CORNERS)
     cum_array = cv.resize(cum_array, [960, 540])
     cv.imshow(f"Cumulative distribution over {n_images} frames", cum_array)
 
