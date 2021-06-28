@@ -11,7 +11,9 @@ def DBSCAN_cluster(img):
 
     db = cluster.DBSCAN(eps=3, min_samples=15).fit(coordinates)
     unique, counts = np.unique(db.labels_, return_counts=True)
-    valid_clusters = np.where(counts[1:] > 500)[0]
+
+    valid_clusters = np.where(counts[1:] > 100)[0]
+
     n_chickens = valid_clusters.size
 
     print(f"Number of clusters is {n_chickens}")
