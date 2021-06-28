@@ -22,20 +22,20 @@ INNER_BED_CORNERS = np.array([
 
 VIDEO_NUM = 1
 IMG_NUM = 1
-N_IMAGES = 8
+N_IMAGES = 5
 IMAGE_INTERVAL = 1000
 FRAME_TIME = 1/19.72
+
 
 def chickens_over_time(video_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES,\
                        image_interval=IMAGE_INTERVAL, frame_time=FRAME_TIME):
     chicken_counter = []
     time = []
     for i in range(n_images):
-        img_num = img_num+image_interval*i
-        n_chickens = find_chickens(video_num, img_num)
+        n_chickens = find_chickens(video_num, img_num+image_interval*i)
 
         chicken_counter.append(n_chickens)
-        time.append(img_num*frame_time)
+        time.append((img_num+image_interval*i)*frame_time)
 
     plt.plot(time, chicken_counter)
     plt.show()
@@ -43,6 +43,7 @@ def chickens_over_time(video_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES,\
 
 def find_chickens(vid_num, img_num):
     dir = f'data/video{vid_num}/img{img_num}.jpg'
+    print(dir)
     img = cv.imread(dir)
     img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     masked_img = mask_image(img, INNER_BED_CORNERS)
