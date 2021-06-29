@@ -1,7 +1,7 @@
 """Run inference with a YOLOv5 model on images, videos, directories, streams
 
 Usage:
-    $ python path/to/detect.py --source path/to/img.jpg --weights yolov5s.pt --img 640
+    $ python path/to/detection.py --source path/to/img.jpg --weights yolov5s.pt --img 640
 """
 
 import argparse
@@ -25,10 +25,10 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 
 @torch.no_grad()
-def run(weights='yolov5s.pt',  # model.pt path(s)
-        source='data/images',  # file/dir/URL/glob, 0 for webcam
-        imgsz=640,  # inference size (pixels)
-        conf_thres=0.25,  # confidence threshold
+def detect(weights='yolo/runs/best.pt',  # model.pt path(s)
+        source='yolo/data/test/images',  # file/dir/URL/glob, 0 for webcam
+        imgsz=416,  # inference size (pixels)
+        conf_thres=0.4,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
@@ -41,9 +41,9 @@ def run(weights='yolov5s.pt',  # model.pt path(s)
         agnostic_nms=False,  # class-agnostic NMS
         augment=False,  # augmented inference
         update=False,  # update all models
-        project='runs/detect',  # save results to project/name
+        project='yolo/runs/detect',  # save results to project/name
         name='exp',  # save results to project/name
-        exist_ok=False,  # existing project/name ok, do not increment
+        exist_ok=True,  # existing project/name ok, do not increment
         line_thickness=1,  # bounding box thickness (pixels)
         hide_labels=False,  # hide labels
         hide_conf=False,  # hide confidences
@@ -219,19 +219,10 @@ def parse_opt():
 def main(opt):
     print(colorstr('detect: ') + ', '.join(f'{k}={v}' for k, v in vars(opt).items()))
     check_requirements(exclude=('tensorboard', 'thop'))
-    run(**vars(opt))
+    detect(**vars(opt))
 
 
 if __name__ == "__main__":
     opt = parse_opt()
-
-    opt.weights = 'runs/best.pt'
-    opt.source = './data/test/images'
-
-    opt.imgsz = 416
-    opt.conf_thres = 0.4
-
-    opt.save_txt = True
-    opt.exist_ok = True
 
     main(opt)
