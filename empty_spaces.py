@@ -7,8 +7,8 @@ from visualizer import create_heat_map
 CORNERS = np.array([
     [1000, 400],
     [1600, 200],
-    [2100, 1540],
-    [300, 1540]
+    [2100, 1536],
+    [300, 1536]
 ])
 
 VIDEO_NUM = 2
