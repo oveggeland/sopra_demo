@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 from scipy.optimize import fsolve
 from read_yolo_output import return_center
+from gui import request_corners
 
 
 # Residual function to feed nonlinear solver in search of a good line parameterization for points x0 and x1
@@ -47,15 +48,9 @@ if __name__ == "__main__":
     if line[0] < 1e-10 and abs(line[1]-1) < 1e-10:
         print("Line function working!")
 
-    points = np.array([
-        [40, 50],
-        [370, 50],
-        [380, 370],
-        [40, 370]
-    ])
-
-    # Load img and draw lines
     img = cv.imread("yolo/runs/detect/exp/1001_jpg.rf.5746260f252219fdb0f254e167edacc2.jpg")
+    points = request_corners(img)
+
     for i in range(4):
         cv.line(img, points[i-1], points[i], (255, 0, 0), 3)
     cv.imshow("lines", img)

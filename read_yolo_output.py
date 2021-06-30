@@ -3,7 +3,7 @@ import pandas as pd
 import cv2 as cv
 from image_utils import mask_image
 
-def return_center(path = "yolo/runs/detect/exp/labels/1001_jpg.rf.5746260f252219fdb0f254e167edacc2.txt", as_pixel = TRUE):
+def return_center(path = "yolo/runs/detect/exp/labels/1001_jpg.rf.5746260f252219fdb0f254e167edacc2.txt", as_pixel = True):
     """Return center of yolo detected objects as a numpy array with x, y coordinates"""
     data = pd.read_csv(path, sep=" ", header=None)
     data.columns = ["class", "x", "y", "w", "h."]
