@@ -4,12 +4,13 @@ import numpy as np
 from image_utils import dlt
 
 
-def draw_circles(img, centers, radius=5, linesize=3):
+def draw_circles(img, centers, color=(127, 127, 127), radius=5, linesize=3, show=True):
     #img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
     for i in range(centers.shape[0]):
         center = (centers[i, 0], centers[i, 1])
-        cv.circle(img, center, radius, (0, 255, 0), linesize)
-    cv.imshow('Circles', img)
+        cv.circle(img, center, radius, color, linesize)
+    if show:
+        cv.imshow('Circles', img)
     return img
 
 

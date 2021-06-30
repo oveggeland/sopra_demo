@@ -1,8 +1,11 @@
 import cv2 as cv
 import numpy as np
 from scipy.optimize import fsolve
-from read_yolo_output import return_center
+
+from read_yolo_output import return_centers
 from gui import request_corners
+from image_utils import mask_image
+from visualizer import draw_circles
 
 
 # Residual function to feed nonlinear solver in search of a good line parameterization for points x0 and x1
@@ -43,29 +46,33 @@ def get_points_near_lines(points, lines, threshold=15):
     return points[indices, :]
 
 
+def chickens_in_area(centers, corners, img):
+    h, w, d = img.shape
+
+    centers_matrix = np.zeros(img.shape[0:2])
+    centers_matrix[centers[:, 0], centers[:, 1]] = 1
+    mask = mask_image(centers_matrix, corners)
+
+    # convert positions back to coordinates
+    coordinates_of_interest = np.where(mask == 1)
+    return np.transpose(np.vstack((coordinates_of_interest[0], coordinates_of_interest[1])))
+
+
+
 if __name__ == "__main__":
-    line = get_line_params(np.array([1, 4]), np.array([1, -1]))
-    if line[0] < 1e-10 and abs(line[1]-1) < 1e-10:
-        print("Line function working!")
-
     img = cv.imread("yolo/runs/detect/exp/1001_jpg.rf.5746260f252219fdb0f254e167edacc2.jpg")
-    points = request_corners(img)
-
-    for i in range(4):
-        cv.line(img, points[i-1], points[i], (255, 0, 0), 3)
-    cv.imshow("lines", img)
-
-    #Load centers
-    centers = return_center()
-    debug = 1
-
+    corners = request_corners(img)
     lines = []
-    for i in range(4):
-        lines.append(get_line_params(points[i-1], points[i]))
+    for i in range(len(corners)):
+        cv.line(img, corners[i - 1], corners[i], (255, 0, 0), 3)
+        lines.append(get_line_params(corners[i - 1], corners[i]))
+
+    # Load centers
+    centers = return_centers()
     sitters = get_points_near_lines(centers, lines).astype(int)
+    bathers = chickens_in_area(centers, corners, img)
 
-    for chicken in sitters:
-        cv.circle(img, (chicken[0], chicken[1]), 2, (0, 255, 255), 2)
-
-    cv.imshow("Sitters", cv.resize(img, (720, 720)))
+    img = draw_circles(img, bathers, color=(0, 255, 0), show=False, linesize=2)
+    img = draw_circles(img, sitters, color=(0, 0, 255), show=False, linesize=2)
+    cv.imshow("Coolio", img)
     cv.waitKey()

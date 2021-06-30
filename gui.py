@@ -5,16 +5,16 @@ import numpy as np
 def draw_circle(event, x, y, flags, param):
     global mouseX, mouseY
     if event == cv.EVENT_LBUTTONDOWN:
-        cv.circle(param[0], (x, y), 20, (0, 255, 0), 5)
+        cv.circle(param[0], (x, y), param[2], param[3], param[4])
         mouseX, mouseY = x, y
         print(f'You clicked on ({x}, {y})')
         param[1].append(np.array([x, y]))
 
 
-def request_corners(img, num=None):
+def request_corners(img, radius=10, color=(255, 0, 0), line_thickness=2, num=None):
     cv.namedWindow('image')
     corners = []
-    cv.setMouseCallback('image', draw_circle, [img, corners])
+    cv.setMouseCallback('image', draw_circle, [img, corners, radius, color, line_thickness])
 
     print(f"Click on corners. z button regrets the last corner. q to finish.")
     while True:
