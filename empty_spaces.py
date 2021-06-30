@@ -3,6 +3,7 @@ import numpy as np
 
 from clustering import DBSCAN_cluster
 from visualizer import create_heat_map
+from image_utils import mask_image
 
 CORNERS = np.array([
     [1000, 400],
@@ -31,9 +32,7 @@ def find_empty_spaces(vid_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES, ima
     cum_array = cum_array.astype(np.uint8)
 
     # Mask out area of interest defined by CORNERS
-    img_mask = np.zeros(cum_array.shape)
-    img_mask = cv.fillPoly(img_mask, [CORNERS], 1)
-    cum_array = np.where(img_mask == 1, cum_array, 255)
+    cum_array = mask_image(cum_array, CORNERS)
 
 
     #Reshape and show on screen!
