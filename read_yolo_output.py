@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import cv2 as cv
 from image_utils import mask_image
+
 from visualizer import draw_circles
 
 def return_center(file_name = "1001_jpg.rf.5746260f252219fdb0f254e167edacc2", as_pixel = True):
