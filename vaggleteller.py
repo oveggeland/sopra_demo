@@ -47,15 +47,13 @@ def get_points_near_lines(points, lines, threshold=15):
 
 
 def chickens_in_area(centers, corners, img):
-    h, w, d = img.shape
-
-    centers_matrix = np.zeros(img.shape[0:2])
-    centers_matrix[centers[:, 0], centers[:, 1]] = 1
+    centers_matrix = np.zeros(img.shape[:2])
+    centers_matrix[centers[:, 1], centers[:, 0]] = 1
     mask = mask_image(centers_matrix, corners)
 
     # convert positions back to coordinates
     coordinates_of_interest = np.where(mask == 1)
-    return np.transpose(np.vstack((coordinates_of_interest[0], coordinates_of_interest[1])))
+    return np.transpose(np.vstack((coordinates_of_interest[1], coordinates_of_interest[0])))
 
 
 
