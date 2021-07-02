@@ -27,6 +27,17 @@ IMAGE_INTERVAL = 100
 FRAME_TIME = 1/19.72
 
 
+"""
+Counts the amount of chickens over a specified time period and creates a graph of the result
+
+Params:
+    strategy - Strategy for counting chickens (clusters, area, yolo)
+    video_num - ID of video to analyse
+    img_num - First image to start analysing
+    n_images - Number of images to analyse
+    image_interval - Number of images to skip between each analysis
+    frame_time - Time between each image frame
+"""
 def chickens_over_time(strategy='clusters', video_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES,\
                        image_interval=IMAGE_INTERVAL, frame_time=FRAME_TIME):
     chicken_counter = []
@@ -44,6 +55,16 @@ def chickens_over_time(strategy='clusters', video_num=VIDEO_NUM, img_num=IMG_NUM
     plt.show()
 
 
+"""
+Counts the number of chickens in a frame based on the white to black area ratio. 
+
+Params:
+    video_num - ID of video to analyse
+    img_num - ID of image to analyse
+
+Returns:
+    n_chickens - Number of chickens estimated to be in img
+"""
 def find_chickens_by_area(vid_num, img_num):
     dir = f'data/video{vid_num}/img{img_num}.jpg'
     img = cv.imread(dir)
@@ -67,6 +88,16 @@ def find_chickens_by_area(vid_num, img_num):
     return n_chickens
 
 
+"""
+Counts the number of chickens in a frame based the amount of reasonably sized white clusters found. 
+
+Params:
+    video_num - ID of video to analyse
+    img_num - ID of image to analyse
+
+Returns:
+    n_chickens - Number of chickens estimated to be in img
+"""
 def find_chickens_by_clusters(vid_num, img_num):
     dir = f'data/video{vid_num}/img{img_num}.jpg'
     img = cv.imread(dir)
@@ -88,10 +119,14 @@ def find_chickens_by_clusters(vid_num, img_num):
     #cv.imshow('Threshold', threshold_img)
 
     # Cluster white areas to detect chickens
-    img, n_clusters = DBSCAN_cluster(threshold_img)
+    img, n_chickens = DBSCAN_cluster(threshold_img)
 
     key = cv.waitKey()
     if key & 0xFF == ord('q'):
         exit()
 
-    return n_clusters
+    return n_chickens
+
+
+if __name__ == "__main__":
+    chickens_over_time()

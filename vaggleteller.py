@@ -8,17 +8,38 @@ from image_utils import mask_image
 from visualizer import draw_circles
 
 
-# Residual function to feed nonlinear solver in search of a good line parameterization for points x0 and x1
+"""
+Residual function for nonlinear equation set for finding lines. 
+Calculating the errors based on how far points x0 and x1 is from the line defined by theta and rho
+
+Params:
+    x0, x1 - Two dimensional points
+    theta - Angle defining a line
+    rho - Distance defining a line
+
+Returns:
+    res - Residual representing how far of the two points are
+"""
 def line_residual(x0, x1, theta, rho):
     x_tilde = np.array([
         [x0[0], x0[1], 1],
         [x1[0], x1[1], 1]
     ])
     l = np.array([np.cos(theta), np.sin(theta), -rho])
-    return x_tilde @ l
+    res = x_tilde @ l
+    return res
 
 
-# Non linear search for line parameters corresponding to points x0 and x1
+"""
+Finds the homogenous representation of the line defined by points x0 and x1.
+
+Params:
+    x0, x1 - Two dimensional points defining a line
+
+Returns:
+    line - Representation of a line containing the homogenous parameters, and two points bounding the line.
+                Lines are defined on the form [theta, rho, x0, x1]. 
+"""
 def get_line_params(x0, x1):
     res_func = lambda p: line_residual(x0, x1, p[0], p[1])
     while True:
@@ -26,10 +47,21 @@ def get_line_params(x0, x1):
         p, info, _, _ = fsolve(res_func, p0, full_output=True)
         if info['fvec'].all() < 0.001:
             break
-    return np.array([p[0], p[1], x0, x1])
+    line = np.array([p[0], p[1], x0, x1])
+    return line
 
 
-# Return all points that are sufficiently close to all lines
+"""
+Filters out all points that are sufficiently close to a set of lines. 
+
+Params:
+    points - All points to be considered
+    lines - List of lines on the form [theta, rho, x0, x1]
+    threshold - How far a point is allowed to be from a line
+
+Returns:
+    line_points - All points that are sufficiently close to at least one line
+"""
 def get_points_near_lines(points, lines, threshold=15):
     indices = []
     for i in range(points.shape[0]):
@@ -43,17 +75,30 @@ def get_points_near_lines(points, lines, threshold=15):
                         and d2 < np.linalg.norm(line[2]-line[3])+threshold:
                     indices.append(i)
                 break
-    return points[indices, :]
+    line_points = points[indices, :]
+    return line_points
 
 
-def chickens_in_area(centers, corners, img):
-    centers_matrix = np.zeros(img.shape[:2])
-    centers_matrix[centers[:, 1], centers[:, 0]] = 1
+"""
+Finds all points within a specified region defined by a set of corners.
+
+Params:
+    points - All points to be considered
+    corners - The set of corners, forming a polygon as the area of interest
+    img_shape - Shape of the original image, from which points and corners are gathered
+
+Returns:
+    valid_points - All points within the specified region
+"""
+def points_in_area(points, corners, img_shape):
+    centers_matrix = np.zeros(img_shape)
+    centers_matrix[points[:, 1], points[:, 0]] = 1
     mask = mask_image(centers_matrix, corners)
 
     # convert positions back to coordinates
     coordinates_of_interest = np.where(mask == 1)
-    return np.transpose(np.vstack((coordinates_of_interest[1], coordinates_of_interest[0])))
+    valid_points = np.transpose(np.vstack((coordinates_of_interest[1], coordinates_of_interest[0])))
+    return valid_points
 
 
 
@@ -68,7 +113,7 @@ if __name__ == "__main__":
     # Load centers
     centers = return_centers()
     sitters = get_points_near_lines(centers, lines).astype(int)
-    bathers = chickens_in_area(centers, corners, img)
+    bathers = points_in_area(centers, corners, img.shape[:2])
 
     img = draw_circles(img, bathers, color=(0, 255, 0), show=False, linesize=2)
     img = draw_circles(img, sitters, color=(0, 0, 255), show=False, linesize=2)

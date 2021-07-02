@@ -4,16 +4,31 @@ import numpy as np
 from image_utils import dlt
 
 
-def draw_circles(img, centers, color=(127, 127, 127), radius=5, linesize=3, show=True):
-    #img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
+"""
+Draw circles on an image and return a copy
+
+Params:
+    img - Image to draw circles on
+    centers - Numpy array of all circle centers
+    color - Circle color
+    radius - Circle radius
+    line_thickness - Circle line thickness
+"""
+def draw_circles(img, centers, color=(127, 127, 127), radius=5, line_thickness=3):
     for i in range(centers.shape[0]):
         center = (centers[i, 0], centers[i, 1])
-        cv.circle(img, center, radius, color, linesize)
-    if show:
-        cv.imshow('Circles', img)
-    return img
+        cv.circle(img, center, radius, color, line_thickness)
 
 
+"""
+Draw clusters obtained from a DBSCAN. 
+
+Params:
+    img - Image to draw clusters on
+    coordinates - List of coordinates used when clustering
+    db - DBSCANNER object containing cluster information
+    valid_clusters - List of cluster ID's that are considered valid clusters (due to size)
+"""
 def draw_db_clusters(img, coordinates, db, valid_clusters):
     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
     for c in valid_clusters:   # Iterate over each cluster
@@ -28,16 +43,25 @@ def draw_db_clusters(img, coordinates, db, valid_clusters):
     cv.imshow("Colored clusters", img)
 
 
+"""
+Transforms an image area into a rectangular heat map using a direct linear transform.
+
+Params:
+    img - Image source 
+    corners - Corners defining an area to transform
+    width - Width of heat map
+    height - Height of heat map
+
+Returns:
+    new_img - Image of the transformed heat map
+"""
 def create_heat_map(img, corners, width=1000, height=400):
-    img[400:600, 1000:1200] = np.ones((200, 200))*255
-    img[600:900, 1400:1700] = np.ones((300, 300))*127
     XY = np.array([
         [width, width, 0, 0],
         [0, height, height, 0]
     ])
     xy = corners.T
     H = dlt(xy, XY)
-
 
     new_img = np.ones((height, width))
     for x in range(np.min(xy[0, :]), np.max(xy[0, :])):
@@ -50,9 +74,4 @@ def create_heat_map(img, corners, width=1000, height=400):
             else:
                 new_img[new_y, new_x] = img[y, x]
 
-    cv.imshow("old image", cv.resize(img, (width, height)))
-    cv.imshow("new image", new_img)
-
-    #TODO: This is gives ugly black circles where stuff is not transformed, should we do something?
-
-    cv.waitKey()
+    return new_img

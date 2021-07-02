@@ -6,6 +6,15 @@ N_IMAGES = 8
 IMAGE_INTERVAL = 1000
 
 
+"""
+Reads a video and saves .jpg files from specified frames
+
+Params:
+    video_num - ID to define what video to read
+    img_num - First frame to save
+    n_images - Number of frames to save
+    image_interval - Number of frames to skip between saves
+"""
 def read_video(video_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES, image_interval=IMAGE_INTERVAL):
     filename = f"data/video{video_num}/video{video_num}.mp4"
     cap = cv.VideoCapture(filename)
