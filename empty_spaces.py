@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
 
 from clustering import DBSCAN_cluster
 from visualizer import create_heat_map
@@ -14,7 +15,7 @@ CORNERS = np.array([
 
 VIDEO_NUM = 2
 IMG_NUM = 1
-N_IMAGES = 10
+N_IMAGES = 10000
 IMAGE_INTERVAL = 10
 
 """
@@ -49,14 +50,17 @@ def find_empty_spaces(vid_num=VIDEO_NUM, img_num=IMG_NUM, n_images=N_IMAGES, ima
 
 
     # Transform to rectangular grid
-    heat_map = create_heat_map(cum_array, CORNERS)
+    #heat_map = create_heat_map(cum_array, CORNERS)
 
 
     cum_array = cv.resize(cum_array, [960, 540])
     cv.imshow(f"Cumulative distribution over {n_images} frames", cum_array)
 
+    plt.figure()
+    plt.imshow(cum_array)
+    plt.savefig("figs/empty_areas.eps", format="eps")
+
     # Try clustering black areas to see if any large regions are inhabitable
     black_regions = np.where(cum_array < 40, 1, 0).astype(np.uint8)
     clustered_img, n_regions = DBSCAN_cluster(black_regions, min_size=1000)
-    cv.imshow("Clustered heat_map", clustered_img)
     return n_regions

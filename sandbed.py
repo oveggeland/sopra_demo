@@ -119,7 +119,20 @@ def find_chickens_by_clusters(vid_num, img_num):
     #cv.imshow('Threshold', threshold_img)
 
     # Cluster white areas to detect chickens
-    img, n_chickens = DBSCAN_cluster(threshold_img)
+    cluster_img, n_chickens = DBSCAN_cluster(threshold_img)
+
+    # Save figure with result
+    img = cv.resize(img, (cluster_img.shape[1], cluster_img.shape[0]))
+    fig, axs = plt.subplots(1, 2)
+    fig.suptitle(f'Chicken detections by DBSCAN clustering. {n_chickens} chickens found')
+    axs[0].imshow(img)
+    axs[1].imshow(cluster_img)
+    plt.tight_layout()
+    plt.savefig("figs/db_cluster.eps")
+    plt.savefig("figs/db_cluster.png")
+
+    cv.imshow("img", img)
+    cv.imshow("cluster_img", cluster_img)
 
     key = cv.waitKey()
     if key & 0xFF == ord('q'):

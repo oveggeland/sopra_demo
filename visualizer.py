@@ -41,6 +41,7 @@ def draw_db_clusters(img, coordinates, db, valid_clusters):
             img[y, x] = color
 
     cv.imshow("Colored clusters", img)
+    return img
 
 
 """
